@@ -1,0 +1,49 @@
+{
+  "name": "mdcx",
+  "version": "0.0.0",
+  "type": "module",
+  "imports": {
+    "#types": "./src/types/index.ts",
+    "#*": "./src/*.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "run build",
+    "lint": "run lint --",
+    "prepare": "run prepare",
+    "prepublishOnly": "run prepublishOnly",
+    "test": "run test --",
+    "test:coverage": "run test:coverage --",
+    "test:watch": "run test:watch",
+    "typecheck": "run typecheck"
+  },
+  "dependencies": {
+    "type-fest": "^5.3.0",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@presetter/preset-esm": "^9.1.0",
+    "@presetter/preset-strict": "^9.1.0",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "presetter": "^9.1.0",
+    "vitest": "^4.1.0"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.10"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./lib/index.js"
+    },
+    "imports": {
+      "#types": "./lib/types/index.js",
+      "#*": "./lib/*.js"
+    }
+  }
+}
