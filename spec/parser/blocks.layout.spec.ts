@@ -4,11 +4,13 @@ import { tokenize } from '#lexer/tokenize';
 import { buildAst } from '#parser/build';
 import { buildLayoutNode, normalizeIndentation } from '#parser/layout';
 import { isColumnAnnotationRow } from '#parser/table';
+import { stringifyBlock } from '#stringifier/blocks';
+import { stringifyLayoutInline } from '#stringifier/layout';
 
 import { getRange } from '../fixtures/positions';
 
 import type { BlockParser } from '#parser/layout';
-import type { BlockNode } from '#types';
+import type { BlockNode, LayoutNode } from '#types';
 
 // TEST SUITES //
 
@@ -601,4 +603,53 @@ describe('layout cell parsing delegates to generic block parser', () => {
     });
   });
 
+  it('should round-trip a child_page cell through stringify -> parse with ref intact', () => {
+    // canonical round-trip contract: a layout that holds a child_page block
+    // survives stringification (layout writer delegates to stringifyBlock so
+    // adapter `format` output is preserved) and re-parsing (layout parser
+    // delegates to blockParser so adapter `onContent` rehydration fires)
+    // without losing the type or ref.
+    const childPage: BlockNode = {
+      type: 'child_page',
+      ref: 'page-id-xyz',
+      annotations: {},
+      content: [],
+      children: [],
+      range: defaultRange,
+    } as BlockNode;
+
+    const layout: LayoutNode = {
+      type: 'layout',
+      children: [
+        { type: 'column', children: [childPage], range: defaultRange },
+      ],
+      range: defaultRange,
+    };
+
+    const rendered = stringifyLayoutInline({
+      node: layout,
+      options: {
+        omitAnnotations: true,
+        format: (node) =>
+          node.type === 'child_page'
+            ? `[Title]{{type: page, ref: ${node.ref}}}`
+            : '',
+      },
+      stringifyBlockFn: stringifyBlock,
+    });
+
+    // round-trip parse: adapter-aware blockParser recovers child_page
+    const blockParser = createChildPageBlockParser();
+
+    const reparsed = buildLayoutNode({
+      content: rendered.join('\n'),
+      context: { range: defaultRange },
+      blockParser,
+    });
+
+    expect(reparsed.children[0]?.children[0]).toMatchObject({
+      type: 'child_page',
+      ref: 'page-id-xyz',
+    });
+  });
 });
