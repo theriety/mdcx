@@ -1,6 +1,9 @@
+import { generateLocalRef } from '#differ/ref';
+
 import { makeStartRange } from './positions';
 import { DEFAULT_RANGE } from './ranges';
 
+import type { VirtualRefGetter, VirtualRefResolver } from '#differ/operations';
 import type {
   Annotations,
   BlockNode,
@@ -234,3 +237,13 @@ export const createBlockNode = (type: string, ref?: string): BlockNode =>
     children: [],
     range: DEFAULT_RANGE,
   }) as BlockNode;
+
+/** default virtual ref getter for tests - generates unique refs */
+export const testRefGetter: VirtualRefGetter = () => generateLocalRef();
+
+/**
+ * default virtual ref resolver for tests - uses existing ref or generates one
+ * @param node the block node to resolve a ref for
+ */
+export const testRefResolver: VirtualRefResolver = (node) =>
+  node.ref ?? generateLocalRef();

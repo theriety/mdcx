@@ -1,5 +1,6 @@
 // FUNCTIONS //
 
+export { diff } from '#diff';
 export { ParseError } from '#errors';
 export type { ParseErrorCode } from '#errors';
 export { parse, parseInlineContent } from '#parse';
